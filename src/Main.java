@@ -32,12 +32,6 @@ public class Main {
   public PrintStream[] os;
 
   /**
-   * Is player ready
-   * Bitmask status
-   */
-  public int ready;
-
-  /**
    * Client number
    */
   public int clientNum;
@@ -49,6 +43,15 @@ public class Main {
   {
     ready = 0;
     board = new Board();
+  }
+
+  /**
+   * Prints command line help
+   */
+  public void help() {
+    System.out.println("arguments:");
+    System.out.println(" [serverport]");
+    System.out.println();
   }
 
   /**

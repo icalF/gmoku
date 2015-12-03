@@ -16,14 +16,10 @@ public class Board {
   public byte player = 'A';
 
   /**
-   * Is game over.
+   * Is all player ready
+   * Bitmask status
    */
-  public boolean gameOver = false;
-
-  /**
-   * Score each player
-   */
-  public int[] score;
+  public int readyAll = 0;
 
   /**
    * Constructor
@@ -69,38 +65,6 @@ public class Board {
    */
   public void setCell(int x, int y, byte v) {
     data[y * w + x] = v;
-  }
-
-  /**
-   * Get score (number of captured stones so far)
-   * @param p Player ('A' - 'T')
-   */
-  public int getScore(byte p) {
-    int playerId = p - 'A';
-    if (playerId < 0 || playerId > 19)
-      return -1;
-    return score[playerId];
-  }
-
-  /**
-   * Set score
-   * @param p Player ('A' - 'T')
-   * @param s Score
-   */
-  void setScore(byte p, int s) {
-    int playerId = p - 'A';
-    if (playerId < 0 || playerId > 19)
-      return;
-    score[playerId] = s;
-  }
-
-  /**
-   * Increments score (by 2)
-   * @param p Player ('A' - 'T')
-   */
-  void incScore(byte p) {
-    int playerId = p - 'A';
-    score[playerId] += 2;
   }
 
   /**
@@ -165,7 +129,7 @@ public class Board {
    * @return The color of the next player
    */
   public byte next(byte c) {
-    return (byte)((c - 'A' + 1) % 20 + 'A');
+    return (byte)((c - (byte)'A' + 1) % 20 + (byte)'A');
   }
 
   /**
@@ -181,25 +145,6 @@ public class Board {
     lastX = p.x;
     lastY = p.y;
 
-    for (int d = 0; d < 8; d ++) {
-      Point q = p.copy();
-      if (!advance(q, d)) continue;
-      if (getCell(q) != player) {
-        int st[] = streak(q.copy(), d);
-        if (st[0] == 1 && st[1] == player) {
-          setCell(q, (byte) 0);
-          advance(q, d);
-          setCell(q, (byte) 0);
-          incScore(player);
-        }
-      }
-    }
-
-    if (getScore(player) >= 10) {
-      gameOver = true;
-      return 1;
-    }
-
     for (int d = 0; d < 4; d ++) {
       int s = 0;
       int st[] = streak(p.copy(), d);
@@ -208,12 +153,11 @@ public class Board {
       s += st[0];
       if (s > 3) {
         gameOver = true;
-        return 1;
+        return id;
       }
     }
 
     player = next(player);
-
     return 0;
   }
 }
