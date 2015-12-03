@@ -1,3 +1,5 @@
+import java.io.*;
+
 /**
  * Represents a Gobang game (board and score)
  */
@@ -13,7 +15,7 @@ public class Board {
   /**
    * Next player.
    */
-  public byte player = 'A';
+  public byte turn = 'A';
 
   /**
    * Is all player ready
@@ -22,10 +24,15 @@ public class Board {
   public int readyAll = 0;
 
   /**
+   * Player list
+   * Bitmask status
+   */
+  public int players = 0;
+
+  /**
    * Constructor
    */
   public Board() {
-    score = new int[20];
     data = new byte[h * w];
   }
 
@@ -138,9 +145,8 @@ public class Board {
    * @return -1 if the move is illegal, 1 if the move wins the game
    */
   public int move(Point p) {
-    if (gameOver) return -1;
     if (getCell(p) != 0) return -1;
-    setCell(p, player);
+    setCell(p, turn);
 
     lastX = p.x;
     lastY = p.y;
@@ -152,12 +158,12 @@ public class Board {
       st = streak(p.copy(), d + 4);
       s += st[0];
       if (s > 3) {
-        gameOver = true;
-        return id;
+        readyAll = players;
+        return turn;
       }
     }
 
-    player = next(player);
+    turn = next(turn);
     return 0;
   }
 }
