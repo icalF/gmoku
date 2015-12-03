@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.*;
 
 /**
  * Represents a Gobang game (board and score)
@@ -18,6 +19,12 @@ public class Board {
   public byte turn = 'A';
 
   /**
+   * Board changed by player turn
+   * Bitmask flag (if true then certain player has not update the board)
+   */
+  public int changed = 0;
+
+  /**
    * Is all player ready
    * Bitmask status
    */
@@ -34,6 +41,15 @@ public class Board {
    */
   public Board() {
     data = new byte[h * w];
+  }
+
+  /**
+   * Reset board
+   */
+  public void reset() {
+    Arrays.fill(data, (byte)0);
+    readyAll = 0;
+    turn = next(turn);
   }
 
   /**
@@ -132,17 +148,37 @@ public class Board {
   }
 
   /**
+   * Remove existing player
+   */
+  public void removePlayer(byte id) {
+    players &= ~(1 << (id - (byte)'A'));
+    readyAll &= ~(1 << (id - (byte)'A'));
+  }
+
+  /**
+   * Add new player
+   * @return byte new player's id
+   */
+  public byte addPlayer() {
+    int i = 0;
+    while (((players >>> i) & 1) == 1) { i++; if (i == 20) i = 0; }
+    return (byte)(i + 'A');
+  }
+
+  /**
    * Returns the color of the next player
    * @return The color of the next player
    */
   public byte next(byte c) {
-    return (byte)((c - (byte)'A' + 1) % 20 + (byte)'A');
+    int i = c - (byte)'A';
+    while (((players >>> i) & 1) != 1) { i++; if (i == 20) i = 0; }
+    return (byte)(i + 'A');
   }
 
   /**
    * Makes a move
    * @param p Point
-   * @return -1 if the move is illegal, 1 if the move wins the game
+   * @return -1 if the move is illegal, > 0 if the move wins the game
    */
   public int move(Point p) {
     if (getCell(p) != 0) return -1;
@@ -158,7 +194,7 @@ public class Board {
       st = streak(p.copy(), d + 4);
       s += st[0];
       if (s > 3) {
-        readyAll = players;
+        reset();
         return turn;
       }
     }

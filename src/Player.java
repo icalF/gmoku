@@ -7,13 +7,12 @@ public class Player implements Runnable
   BufferedReader is;
   byte id;
 
-  public Player(PrintStream os, BufferedReader is, byte id, Board board)
+  public Player(PrintStream os, BufferedReader is, Board board)
   {
     this.os = os;
     this.is = is;
-    this.id = id;
     this.board = board;
-    board.readyAll |= (1 << (id - (byte)'A'));
+    id = board.addPlayer();
   }
 
   /**
@@ -31,7 +30,7 @@ public class Player implements Runnable
           do { line = is.readLine(); } while (line.length() < 1);
           if (line.equals("ready"))
           {
-            board.readyAll ^= (1 << (id - (byte)'A'));
+            board.readyAll |= (1 << (id - (byte)'A'));
             playNow = true;
           }
           os.println(id);
@@ -64,6 +63,8 @@ public class Player implements Runnable
         }
       }
     } catch (NullPointerException e) {
+      board.removePlayer(id);      // delete player from board
+      e.printStackTrace();
     } catch (IOException e) {
     } catch (RuntimeException e) {
       System.out.println("Error occurred : " + e);

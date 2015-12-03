@@ -22,28 +22,9 @@ public class Main {
   public int dim;
 
   /**
-   * Client socket output stream
-   */
-  public PrintStream[] os;
-
-  /**
-   * Client socket input stream
-   */
-  public PrintStream[] os;
-
-  /**
    * Client number
    */
   public int clientNum;
-
-  /**
-   * Initialize game
-   */
-  public void gameInit() 
-  {
-    ready = 0;
-    board = new Board();
-  }
 
   /**
    * Prints command line help
@@ -79,8 +60,10 @@ public class Main {
 
     ServerSocket ss = null;
     String line;
+    PrintStream os = null;
     BufferedReader is = null;
     Socket cs = null;
+    Board board = new Board();
 
     try {
       ss = new ServerSocket(serverPort);
@@ -89,31 +72,18 @@ public class Main {
       System.exit(1);
     }
 
-    System.out.print((char) 27 + "[2J" + (char) 27 + "[H");
-    System.out.println("!waiting for client");
-    try {
-      cs = ss.accept();
-      is = new BufferedReader(new InputStreamReader(cs.getInputStream()));
-      os = new PrintStream(cs.getOutputStream());
-    } catch (IOException e) {
-      System.out.println("foiled! " + e);
-      System.exit(1);
+    while (true) {
+      try {
+        cs = ss.accept();
+        is = new BufferedReader(new InputStreamReader(cs.getInputStream()));
+        os = new PrintStream(cs.getOutputStream());
+
+        while (board.players == board.readyAll);          // game still running
+        (new Thread(new Player(os, is, board))).start();
+      } catch (IOException e) {
+        System.out.println("Connection error :" + e);
+        // System.exit(1);
+      }
     }
-
-    System.out.println("!client is connected");
-    System.out.println("Type ? for help");
-    System.out.println();
-
-    os.print((char) 27 + "[2J" + (char) 27 + "[H");
-    os.println("Welcome to a game of Gobang");
-    os.println("Type ? for help");
-    os.print("The board is " + dim + "x" + dim);
-    if (w) os.print(" wraparound");
-    os.println();
-    os.println();
-
-    gameInit();
-
-    new Local().start();
   }
 }
