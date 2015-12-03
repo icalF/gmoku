@@ -3,6 +3,8 @@ import java.net.*;
 
 /**
  * Main class
+ *
+ * @author Afrizal
  */
 public class Main {
   /**
@@ -17,19 +19,9 @@ public class Main {
   public Board board = null;
 
   /**
-   * Board dimension
-   */
-  public int dim;
-
-  /**
-   * Client number
-   */
-  public int clientNum;
-
-  /**
    * Prints command line help
    */
-  public void help() {
+  public static void help() {
     System.out.println("arguments:");
     System.out.println(" [serverport]");
     System.out.println();
@@ -39,7 +31,7 @@ public class Main {
    * Entry point
    * @param argv Comand line arguments
    */
-  public void main(String argv[]) 
+  public static void main(String argv[]) 
   {
     if (argv.length > 1) {
       help();
@@ -78,7 +70,7 @@ public class Main {
         is = new BufferedReader(new InputStreamReader(cs.getInputStream()));
         os = new PrintStream(cs.getOutputStream());
 
-        while (board.players == board.readyAll);          // game still running
+        while (board.players != 0 && board.players == board.readyAll);          // game still running
         (new Thread(new Player(os, is, board))).start();
       } catch (IOException e) {
         System.out.println("Connection error :" + e);

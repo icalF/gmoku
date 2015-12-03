@@ -2,16 +2,17 @@ import java.io.*;
 import java.util.*;
 
 /**
- * Represents a Gobang game (board and score)
+ * Represents a Gobang game (board)
+ *
+ * @author Afrizal
  */
 public class Board {
   byte[] data;
-  final static int w = 20;
-  final static int h = 20;
-  public int lastX = -1;
-  public int lastY = -1;
-  static final int dr[] = {-1,-1,0,1,1,1,0,-1};
-  static final int dc[] = {0,-1,-1,-1,0,1,1,1};
+  final int w = 20;
+  final int h = 20;
+  final int dr[] = {-1,-1,0,1,1,1,0,-1};
+  final int dc[] = {0,-1,-1,-1,0,1,1,1};
+  public Object playerLock = new Object();    // lock for all player state
 
   /**
    * Next player.
@@ -151,8 +152,10 @@ public class Board {
    * Remove existing player
    */
   public void removePlayer(byte id) {
-    players &= ~(1 << (id - (byte)'A'));
-    readyAll &= ~(1 << (id - (byte)'A'));
+    synchronized (playerLock) {
+      players &= ~(1 << (id - (byte)'A'));
+      readyAll &= ~(1 << (id - (byte)'A'));
+    }
   }
 
   /**
@@ -161,7 +164,11 @@ public class Board {
    */
   public byte addPlayer() {
     int i = 0;
-    while (((players >>> i) & 1) == 1) { i++; if (i == 20) i = 0; }
+    synchronized (playerLock) {
+      while (i < 20 && ((players >>> i) & 1) == 1) i++;
+      players |= (1 << i);
+    }
+    if (i == 20) return -1;
     return (byte)(i + 'A');
   }
 
@@ -183,9 +190,6 @@ public class Board {
   public int move(Point p) {
     if (getCell(p) != 0) return -1;
     setCell(p, turn);
-
-    lastX = p.x;
-    lastY = p.y;
 
     for (int d = 0; d < 4; d ++) {
       int s = 0;

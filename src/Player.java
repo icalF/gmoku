@@ -1,5 +1,11 @@
 import java.io.*;
 
+/**
+ * Class Player
+ * Player resource controller
+ *
+ * @author Afrizal
+ */
 public class Player implements Runnable
 {
   Board board;
@@ -20,47 +26,90 @@ public class Player implements Runnable
    */
   public void run() {
     String line;
-    try 
-    {
+    try {
+      os.println("Gomoku o youkoso ^^");
       while (true)
       {
-        boolean playNow = false;
-
-        while (!playNow) {
+        os.println("Are you ready? [ready]");
+        while (true) 
+        {
           do { line = is.readLine(); } while (line.length() < 1);
+
           if (line.equals("ready"))
           {
-            board.readyAll |= (1 << (id - (byte)'A'));
-            playNow = true;
-          }
-          os.println(id);
-        }
+            synchronized (board.playerLock) {
+              board.readyAll |= (1 << (id - (byte)'A'));
+            }
 
-        while (playNow)
-        {
-          line = is.readLine();
-          if (line.length() > 0)
-          {
-            if (board.turn == id)           // check turn
-            {
-              int x = (byte) line.charAt(0) - (byte) 'a';
-              int y = (byte) line.charAt(1) - (byte) 'a';
-              if ((x >= 0 && x < board.w) && (y >= 0 && y < board.w))
-              {
-                int r = board.move(new Point(x, y));
-                if (r == -1)
-                  os.println("Invalid move");
-                else if (r == 0 || r == 1) 
-                  printBoard(os);
-                else {
-                  os.println(r == id ? "Win" : "Lose");
-                  playNow = false;
-                }
-                continue;
-              }
+            os.println(board.readyAll);
+
+            if (board.readyAll == board.players) {
+              os.println((char)id);
+              break;
             }
           }
         }
+
+        while (true)
+        {
+          int r = 0;
+
+          printBoard(os);
+
+          if (board.turn == id)                           // check turn
+          {
+            line = is.readLine();
+            if (line.length() > 0)
+            {
+              int x = (byte) line.charAt(0) - (byte) 'a';
+              int y = (byte) line.charAt(1) - (byte) 'a';
+
+              if ((x >= 0 && x < board.w) && (y >= 0 && y < board.w))
+              {
+                r = board.move(new Point(x, y));
+
+                if (r == -1) {
+                  os.println("Invalid move");
+                  continue;
+                }
+                else {
+                  synchronized (board.playerLock) {
+                    board.changed = board.players;
+                    board.changed &= ~(1 << (id - (byte)'A'));
+                  }
+
+                  if (r != 0) 
+                  {
+                    synchronized (board.playerLock) {
+                      board.reset();
+                    }
+                  }
+                }
+              } else {
+                os.println("Invalid grid");
+                continue;
+              } 
+            } 
+
+          } 
+          else {
+            while (board.changed == 0)        // wait until board changed
+              line = is.readLine();           // throw away all input
+
+            synchronized (board.playerLock) {               // 'read' flag
+              board.changed &= ~(1 << (id - (byte)'A'));
+            }
+          }
+
+          while (board.changed != 0);       // wait until all player 'read' the changes
+
+          if (board.readyAll == 0)          // if someone win
+          {
+            os.println(r == id ? "win" : "lose");
+            break;
+          }
+        }
+
       }
     } catch (NullPointerException e) {
       board.removePlayer(id);      // delete player from board
