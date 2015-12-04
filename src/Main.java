@@ -71,7 +71,7 @@ public class Main {
         os = new PrintStream(cs.getOutputStream());
 
         while (board.players != 0 && board.players == board.readyAll);          // game still running
-        (new Thread(new Player(os, is, board))).start();
+        (new Thread(new Player(os, is, board))).start();                        // add new player to game
       } catch (IOException e) {
         System.out.println("Connection error :" + e);
         // System.exit(1);

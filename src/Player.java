@@ -44,19 +44,20 @@ public class Player implements Runnable
             break;
           }
         }
-        os.println(board.readyAll);
 
-        while (board.readyAll != board.players) {}         // wait till all ready
+        os.println(board.players);
+        while (board.readyAll != board.players) {       // wait till all ready
+          System.out.println((char)board.turn);
+        }         
 
         os.println((char)id);
+        // os.flush();
 
         while (true)
         {
           int r = 0;
 
-          os.println("cok");
           printBoard(os);
-          os.println("cok2");
 
           if (board.turn == id)                           // check turn
           {
@@ -81,28 +82,27 @@ public class Player implements Runnable
                   }
 
                   if (r != 0) 
-                  {
-                    synchronized (board.playerLock) {
-                      board.reset();
-                    }
-                  }
+                    board.reset();
                 }
               } else {
-                os.println("Invalid grid");
                 continue;
               } 
             } 
 
           } 
           else {
-            while (board.changed == 0) {}        // wait until board changed
+            while (board.changed == 0) {                    // wait until board changed
+              System.out.println((char)board.turn);
+            }
 
             synchronized (board.playerLock) {               // 'read' flag
               board.changed &= ~(1 << (id - (byte)'A'));
             }
           }
 
-          while (board.changed != 0) {}       // wait until all player 'read' the changes
+          while (board.changed != 0) {                      // wait until all player 'read' the changes
+            System.out.println((char)board.turn);
+          }
 
           if (board.readyAll == 0)          // if someone win
           {

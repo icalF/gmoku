@@ -49,7 +49,9 @@ public class Board {
    */
   public void reset() {
     Arrays.fill(data, (byte)0);
-    readyAll = 0;
+    synchronized (playerLock) {
+      readyAll = 0;
+    }
     turn = next(turn);
   }
 
@@ -142,7 +144,7 @@ public class Board {
         if (stone < (byte)'A' || stone > (byte)'T')
           s.print(".");
         else
-          s.print(stone);
+          s.print((char)stone);
       }
       s.println();
     }
@@ -178,7 +180,7 @@ public class Board {
    */
   public byte next(byte c) {
     int i = c - (byte)'A';
-    while (((players >>> i) & 1) != 1) { i++; if (i == 20) i = 0; }
+    do { i++; if (i == 20) i = 0; } while (((players >>> i) & 1) != 1);
     return (byte)(i + 'A');
   }
 
