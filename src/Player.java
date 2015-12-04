@@ -41,20 +41,22 @@ public class Player implements Runnable
               board.readyAll |= (1 << (id - (byte)'A'));
             }
 
-            os.println(board.readyAll);
-
-            if (board.readyAll == board.players) {
-              os.println((char)id);
-              break;
-            }
+            break;
           }
         }
+        os.println(board.readyAll);
+
+        while (board.readyAll != board.players) {}         // wait till all ready
+
+        os.println((char)id);
 
         while (true)
         {
           int r = 0;
 
+          os.println("cok");
           printBoard(os);
+          os.println("cok2");
 
           if (board.turn == id)                           // check turn
           {
@@ -93,15 +95,14 @@ public class Player implements Runnable
 
           } 
           else {
-            while (board.changed == 0)        // wait until board changed
-              line = is.readLine();           // throw away all input
+            while (board.changed == 0) {}        // wait until board changed
 
             synchronized (board.playerLock) {               // 'read' flag
               board.changed &= ~(1 << (id - (byte)'A'));
             }
           }
 
-          while (board.changed != 0);       // wait until all player 'read' the changes
+          while (board.changed != 0) {}       // wait until all player 'read' the changes
 
           if (board.readyAll == 0)          // if someone win
           {
