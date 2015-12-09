@@ -138,6 +138,7 @@ public class Board {
   public void print(PrintStream s) {
     int x, y;
     for (y = 0; y < h; y ++) {
+      s.print(" "+y);
       for (x = 0; x < w; x ++) {
         s.print (" ");
         int stone = getCell(x, y);
