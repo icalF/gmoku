@@ -62,31 +62,7 @@ public class Player implements Runnable {
 
                     if (board.turn == id)                           // check turn
                     {
-                        line = is.readLine();
-                        if (line.length() > 0) {
-                            int x = (byte) line.charAt(0) - (byte) 'a';
-                            int y = (byte) line.charAt(1) - (byte) 'a';
-
-                            if ((x >= 0 && x < Board.WIDTH) && (y >= 0 && y < Board.WIDTH)) {
-                                r = board.move(new Point(x, y));
-
-                                if (r == -1) {
-                                    os.println("Invalid move");
-                                    continue;
-                                } else {
-                                    synchronized (board.playerLock) {
-                                        board.changed = board.players;
-                                        board.changed &= ~(1 << (id - (byte) 'A'));
-                                    }
-
-                                    if (r != 0)
-                                        board.reset();
-                                }
-                            } else {
-                                continue;
-                            }
-                        }
-
+                        r = play(is.readLine());
                     } else {
                         while (board.changed == 0) {                    // wait until adt changed
                             System.out.println((char) board.turn);
@@ -116,6 +92,32 @@ public class Player implements Runnable {
         } catch (RuntimeException e) {
             System.out.println("Error occurred : " + e);
             System.exit(1);
+        }
+    }
+
+    private int play(String line, int currentR) {
+        if (line.length() > 0) {
+            int x = (byte) line.charAt(0) - (byte) 'a';
+            int y = (byte) line.charAt(1) - (byte) 'a';
+
+            if ((x >= 0 && x < Board.WIDTH) && (y >= 0 && y < Board.WIDTH)) {
+                currentR = board.move(new Point(x, y));
+
+                if (currentR == -1) {
+                    os.println("Invalid move");
+                    continue;
+                } else {
+                    synchronized (board.playerLock) {
+                        board.changed = board.players;
+                        board.changed &= ~(1 << (id - (byte) 'A'));
+                    }
+
+                    if (r != 0)
+                        board.reset();
+                }
+            } else {
+                continue;
+            }
         }
     }
 
