@@ -1,0 +1,6 @@
+rootProject.name = 'Gomokuton-Actor'
+
+include ':Gomokuton-ADT'
+
+project(':Gomokuton-ADT').projectDir = new File(settingsDir, '../adt')
+

@@ -1,10 +1,10 @@
-package server;
+package org.gomokuton.server;
 
 import java.io.*;
 import java.net.*;
 
-import actor.Player;
-import adt.Board;
+import org.gomokuton.actor.Player;
+import org.gomokuton.adt.Board;
 
 /**
  * server.Runner class

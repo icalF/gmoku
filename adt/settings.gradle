@@ -1,0 +1,6 @@
+rootProject.name = 'Gomokuton-ADT'
+
+//include ':Classy'
+
+//project(':Classy').projectDir = new File(settingsDir, '../')
+

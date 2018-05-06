@@ -1,4 +1,4 @@
-package adt;
+package org.gomokuton.adt;
 
 import java.io.*;
 import java.util.*;
@@ -16,7 +16,8 @@ public class Board {
     final int dc[] = {0, -1, -1, -1, 0, 1, 1, 1};
 
     byte[] data;
-    public Object playerLock = new Object();    // lock for all player state
+
+    public final Object playerLock;               // lock for all player state
 
     /**
      * Next player.
@@ -45,6 +46,7 @@ public class Board {
      * Constructor
      */
     public Board() {
+        playerLock = new Object();
         data = new byte[HEIGHT * WIDTH];
     }
 

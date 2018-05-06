@@ -1,0 +1,10 @@
+rootProject.name = 'Gomokuton'
+
+include ':Gomokuton-ADT'
+include ':Gomokuton-Actor'
+include ':Gomokuton-Server'
+
+project(':Gomokuton-ADT').projectDir = new File(settingsDir, 'adt')
+project(':Gomokuton-Actor').projectDir = new File(settingsDir, 'actor')
+project(':Gomokuton-Server').projectDir = new File(settingsDir, 'server')
+

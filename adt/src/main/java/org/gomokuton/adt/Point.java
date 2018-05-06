@@ -1,4 +1,4 @@
-package adt;
+package org.gomokuton.adt;
 
 /**
  * Defines an intersection on the adt.
